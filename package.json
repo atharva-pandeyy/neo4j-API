@@ -1,9 +1,7 @@
 {
-  "version": 2,
-  "builds": [
-    { "src": "api/fetch.js", "use": "@vercel/node" }
-  ],
-  "routes": [
-    { "src": "/api/fetch", "dest": "/api/fetch.js" }
-  ]
+  "name": "neo4j-api",
+  "version": "1.0.0",
+  "dependencies": {
+    "neo4j-driver": "^5.15.0"
+  }
 }
