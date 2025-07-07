@@ -18,19 +18,19 @@ export default async function handler(req, res) {
 
   try {
     const cypherQuery = `
-      MATCH (d:Dataset)
-      WHERE toLower(d.title) CONTAINS toLower($query)
-      RETURN d.title AS title, d.content AS content, d.url AS url
-      LIMIT 3
-    `;
+  MATCH (d:Dataset)
+  WHERE toLower(d.name) CONTAINS toLower($query)
+     OR toLower(d.source) CONTAINS toLower($query)
+  RETURN d.name AS name, d.source AS source
+  LIMIT 3
+`;
 
     const result = await session.run(cypherQuery, { query: message });
 
     const data = result.records.map(record => ({
-      title: record.get('title'),
-      content: record.get('content'),
-      url: record.get('url'),
-    }));
+  name: record.get('name'),
+  source: record.get('source'),
+}));
 
     res.status(200).json({ results: data });
   } catch (err) {
