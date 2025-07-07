@@ -1,9 +1,15 @@
 {
   "name": "neo4j-api",
   "version": "1.0.0",
-  "main": "index.js",
   "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node api/fetch.js"
+  },
   "dependencies": {
-    "neo4j-driver": "^5.18.0"
+    "neo4j-driver": "^5.16.0"
+  },
+  "engines": {
+    "node": "18.x"
   }
 }
