@@ -10,7 +10,7 @@ const driver = neo4j.driver(
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Only POST allowed' });
 
-  const { message } = req.body;
+  const { query } = req.body;
 
   if (!message) return res.status(400).json({ error: 'No message provided' });
 
@@ -25,7 +25,7 @@ export default async function handler(req, res) {
   LIMIT 3
 `;
 
-    const result = await session.run(cypherQuery, { query: message });
+    const result = await session.run(cypherQuery, { query: query });
 
     const data = result.records.map(record => ({
   name: record.get('name'),
