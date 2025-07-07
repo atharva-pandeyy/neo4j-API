@@ -1,29 +1,30 @@
 import neo4j from 'neo4j-driver';
 
+// ✅ Init the driver
 const driver = neo4j.driver(
   process.env.NEO4J_URI,
   neo4j.auth.basic(process.env.NEO4J_USERNAME, process.env.NEO4J_PASSWORD)
 );
 
+// ✅ Vercel API Route Handler
 export default async function handler(req, res) {
-  console.log("🚀 Incoming method:", req.method);
-  console.log("📦 Incoming body:", req.body);
+  console.log("📥 Received method:", req.method);
+  console.log("📦 Body received:", req.body);
 
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Only POST allowed' });
+    return res.status(405).json({ error: 'Only POST requests allowed' });
   }
 
   const { query } = req.body;
 
   if (!query) {
-    console.error("❌ Missing query in body");
-    return res.status(400).json({ error: 'No query provided' });
+    return res.status(400).json({ error: 'Missing query in request body' });
   }
 
   const session = driver.session({ database: 'neo4j' });
 
   try {
-    const cypherQuery = `
+    const cypher = `
       MATCH (d:Dataset)
       WHERE toLower(d.name) CONTAINS toLower($query)
          OR toLower(d.source) CONTAINS toLower($query)
@@ -31,24 +32,25 @@ export default async function handler(req, res) {
       LIMIT 3
     `;
 
-    const result = await session.run(cypherQuery, { query });
+    const result = await session.run(cypher, { query });
 
     const data = result.records.map(record => ({
       name: record.get('name'),
       source: record.get('source'),
     }));
 
-    console.log("✅ Results:", data);
-    res.status(200).json({ results: data });
+    console.log("✅ Query Results:", data);
+
+    return res.status(200).json({ results: data });
   } catch (err) {
-    console.error("🔥 Neo4j Error:", err);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error("🔥 Neo4j query failed:", err);
+    return res.status(500).json({ error: 'Internal Server Error' });
   } finally {
     await session.close();
   }
 }
 
-// ✅ Vercel config to parse JSON
+// ✅ Ensure bodyParser is enabled
 export const config = {
   api: {
     bodyParser: true,
