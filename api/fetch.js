@@ -6,6 +6,9 @@ const driver = neo4j.driver(
 );
 
 export default async function handler(req, res) {
+  console.log("🚀 Incoming method:", req.method);
+  console.log("📦 Incoming body:", req.body);
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Only POST allowed' });
   }
@@ -13,6 +16,7 @@ export default async function handler(req, res) {
   const { query } = req.body;
 
   if (!query) {
+    console.error("❌ Missing query in body");
     return res.status(400).json({ error: 'No query provided' });
   }
 
@@ -34,16 +38,17 @@ export default async function handler(req, res) {
       source: record.get('source'),
     }));
 
+    console.log("✅ Results:", data);
     res.status(200).json({ results: data });
   } catch (err) {
-    console.error('Neo4j error:', err);
+    console.error("🔥 Neo4j Error:", err);
     res.status(500).json({ error: 'Internal Server Error' });
   } finally {
     await session.close();
   }
 }
 
-// ✅ Put this at the end of the file
+// ✅ Vercel config to parse JSON
 export const config = {
   api: {
     bodyParser: true,
