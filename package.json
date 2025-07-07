@@ -1,0 +1,9 @@
+{
+  "name": "neo4j-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "dependencies": {
+    "neo4j-driver": "^5.18.0"
+  }
+}
