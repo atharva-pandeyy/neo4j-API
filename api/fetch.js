@@ -1,5 +1,3 @@
-// api/fetch.js
-// api/fetch.js
 import neo4j from 'neo4j-driver';
 
 const driver = neo4j.driver(
@@ -8,29 +6,33 @@ const driver = neo4j.driver(
 );
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Only POST allowed' });
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Only POST allowed' });
+  }
 
   const { query } = req.body;
 
-  if (!message) return res.status(400).json({ error: 'No message provided' });
+  if (!query) {
+    return res.status(400).json({ error: 'No query provided' });
+  }
 
   const session = driver.session({ database: 'neo4j' });
 
   try {
     const cypherQuery = `
-  MATCH (d:Dataset)
-  WHERE toLower(d.name) CONTAINS toLower($query)
-     OR toLower(d.source) CONTAINS toLower($query)
-  RETURN d.name AS name, d.source AS source
-  LIMIT 3
-`;
+      MATCH (d:Dataset)
+      WHERE toLower(d.name) CONTAINS toLower($query)
+         OR toLower(d.source) CONTAINS toLower($query)
+      RETURN d.name AS name, d.source AS source
+      LIMIT 3
+    `;
 
-    const result = await session.run(cypherQuery, { query: query });
+    const result = await session.run(cypherQuery, { query });
 
     const data = result.records.map(record => ({
-  name: record.get('name'),
-  source: record.get('source'),
-}));
+      name: record.get('name'),
+      source: record.get('source'),
+    }));
 
     res.status(200).json({ results: data });
   } catch (err) {
@@ -40,3 +42,10 @@ export default async function handler(req, res) {
     await session.close();
   }
 }
+
+// ✅ Put this at the end of the file
+export const config = {
+  api: {
+    bodyParser: true,
+  },
+};
