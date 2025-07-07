@@ -1,9 +1,10 @@
 // api/fetch.js
+// api/fetch.js
 import neo4j from 'neo4j-driver';
 
 const driver = neo4j.driver(
-  'neo4j+s://5d37aab9.databases.neo4j.io',
-  neo4j.auth.basic('neo4j', 's2lUfeAvejIxQHDySSZNAubPPyd5MC-QGMynCPg0hYs')
+  process.env.NEO4J_URI,
+  neo4j.auth.basic(process.env.NEO4J_USERNAME, process.env.NEO4J_PASSWORD)
 );
 
 export default async function handler(req, res) {
