@@ -1,8 +1,9 @@
+// api/fetch.js
 import neo4j from 'neo4j-driver';
 
 const driver = neo4j.driver(
-  process.env.NEO4J_URI,
-  neo4j.auth.basic(process.env.NEO4J_USERNAME, process.env.NEO4J_PASSWORD)
+  'neo4j+s://5d37aab9.databases.neo4j.io', // <--- Replace if URI changes
+  neo4j.auth.basic('neo4j', 's2lUfeAvejIxQHDySSZNAubPPyd5MC-QGMynCPg0hYs') // <--- Replace if password changes
 );
 
 export default async function handler(req, res) {
@@ -21,33 +22,27 @@ export default async function handler(req, res) {
   try {
     const cypher = `
       CALL {
-        // Dataset
         MATCH (n:Dataset)
         WHERE toLower(n.name) CONTAINS toLower($query)
            OR toLower(n.source) CONTAINS toLower($query)
         RETURN n.name AS name, n.source AS info, 'Dataset' AS type
         UNION
-        // SatelliteProduct
         MATCH (n:SatelliteProduct)
         WHERE toLower(n.name) CONTAINS toLower($query)
         RETURN n.name AS name, n.description AS info, 'SatelliteProduct' AS type
         UNION
-        // Satellite
         MATCH (n:Satellite)
         WHERE toLower(n.name) CONTAINS toLower($query)
         RETURN n.name AS name, n.description AS info, 'Satellite' AS type
         UNION
-        // Document
         MATCH (n:Document)
         WHERE toLower(n.title) CONTAINS toLower($query)
         RETURN n.title AS name, n.url AS info, 'Document' AS type
         UNION
-        // Page
         MATCH (n:Page)
         WHERE toLower(n.title) CONTAINS toLower($query)
         RETURN n.title AS name, n.url AS info, 'Page' AS type
         UNION
-        // Phenomenon
         MATCH (n:Phenomenon)
         WHERE toLower(n.name) CONTAINS toLower($query)
         RETURN n.name AS name, '' AS info, 'Phenomenon' AS type
